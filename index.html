@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </head>
+  <body>
+
+    <canvas id="myCanvas" width="500" height="500" style="border:1px solid #d3d3d3;">
+    Your browser does not support the HTML5 canvas tag.</canvas>
+    <p id="gameOver"><p>
+
+    <script>
+
+      var c = document.getElementById("myCanvas");
+      var ctx = c.getContext("2d");
+      var numTries = 0;
+
+      var tiles = [];
+      var words = [
+        'Bach',
+        'Beethoven',
+        'Brahms',
+        'Bruckner',
+        'Bruch',
+        'Ries',
+        'Rachy',
+        'Tchaik',
+        'Webern',
+        'Schoenberg',
+        'Sibelius',
+        'Suk'
+      ];
+
+      var selected = [];
+      var tilesInPlay = [];
+
+      $( "#myCanvas" ).mousedown(function() {
+        var mouseX = event.pageX;
+        var mouseY = event.pageY;
+        for (var i=0; i<tiles.length; i++) {
+          if (tiles[i].isUnderMouse(mouseX, mouseY)) {
+            if (tilesInPlay.length < 2 && !tiles[i].isFaceUp) {
+              tiles[i].drawFaceUp();
+              tilesInPlay.push(tiles[i]);
+              if (tilesInPlay.length === 2) {
+                numTries++;
+                if (tilesInPlay[0].word === tilesInPlay[1].word) {
+                  tilesInPlay[0].isMatch = true;
+                  tilesInPlay[1].isMatch = true;
+                } else {
+                  var v = tilesInPlay[0];
+                  setTimeout(function(){v.drawFaceDown()}, 1000);
+                  var w = tilesInPlay[1];
+                  setTimeout(function(){w.drawFaceDown()}, 500);
+                }
+                numFlipped = 0;
+                tilesInPlay.length = 0;
+                var foundAllMatches = true;
+                for (var i = 0; i < tiles.length; i++) {
+                  foundAllMatches = foundAllMatches && tiles[i].isMatch;
+                }
+                if (foundAllMatches) {
+                  $("#myCanvas").hide();
+                  $("#gameOver").show().text("You found them all in " + numTries + " tries");
+                }
+              }
+            }
+          }
+        }
+      });
+
+      var Tile = function(x, y, word) {
+        this.x = x;
+        this.y = y;
+        this.word = word;
+        this.width = 70;
+      };
+
+      Tile.prototype.drawFaceDown = function() {
+        ctx.beginPath();
+        ctx.rect(this.x, this.y, this.width, this.width);
+        ctx.fillStyle = "red";
+        ctx.fill();
+        this.isFaceUp = false;
+      }
+
+      Tile.prototype.drawFaceUp = function() {
+        ctx.beginPath();
+        ctx.rect(this.x, this.y, this.width, this.width);
+        ctx.fillStyle = "yellow";
+        ctx.fill();
+        ctx.fillStyle = "black";
+        ctx.font="10px Georgia";
+        ctx.fillText(this.word,this.x,this.y+this.width/2);
+        this.isFaceUp = true;
+      }
+
+      Tile.prototype.isUnderMouse = function(x, y) {
+        return x >= this.x && x <= this.x + this.width  &&
+          y >= this.y && y <= this.y + this.width;
+      };
+
+
+      for (var i = 0; i < 10; i++) {
+        // Randomly pick one from the array of faces
+        var randomInd = Math.floor(Math.random(words.length));
+        var word = words[randomInd];
+        // Push 2 copies onto array
+        selected.push(word);
+        selected.push(word);
+        // Remove from faces array so we don't re-pick
+        words.splice(randomInd, 1);
+      }
+
+      selected.sort(function() {
+        return 0.5 - Math.random();
+      });
+
+      var NUM_COLS = 5;
+      var NUM_ROWS = 4;
+      for (var i = 0; i < NUM_COLS; i++) {
+        for (var j = 0; j < NUM_ROWS; j++) {
+          tiles.push(new Tile(i * 78 + 10, j * 78 + 40, selected.pop()));
+        }
+      }
+
+
+
+      for (var i = 0; i < tiles.length; i++) {
+        tiles[i].drawFaceDown();
+      }
+
+
+    </script>
+
+  </body>
+</html>
