@@ -12,7 +12,7 @@ Tile.prototype.drawFaceDown = function(canvas) {
   canvas.fillStyle = "red";
   canvas.fill();
   this.isFaceUp = false;
-}
+};
 
 Tile.prototype.drawFaceUp = function(canvas) {
   canvas.beginPath();
@@ -23,7 +23,7 @@ Tile.prototype.drawFaceUp = function(canvas) {
   canvas.font="10px Georgia";
   canvas.fillText(this.word,this.x,this.y+this.width/2);
   this.isFaceUp = true;
-}
+};
 
 Tile.prototype.isUnderMouse = function(x, y) {
   return x >= this.x && x <= this.x + this.width  &&
